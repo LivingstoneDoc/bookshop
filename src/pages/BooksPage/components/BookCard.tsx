@@ -13,11 +13,22 @@ interface BookCardProps {
   title: string;
   author: string;
   imgUrl: string;
+  coverType: number[];
+  coverFormat: string[];
   price: number;
 }
 
-export const BookCard = ({ title, author, imgUrl, price }: BookCardProps) => {
+export const BookCard = ({
+  title,
+  author,
+  imgUrl,
+  coverType,
+  coverFormat,
+  price,
+}: BookCardProps) => {
+  const coverTypes = ["мягкая", "твердая"];
   const addIcon = <PlusIcon size={20} />;
+
   return (
     <Card shadow="sm" padding="lg" withBorder h="100%">
       <Card.Section>
@@ -32,8 +43,16 @@ export const BookCard = ({ title, author, imgUrl, price }: BookCardProps) => {
       </Text>
 
       <Stack mt="auto" mb="xs" gap="xs">
-        <SegmentedControl color="blue" fullWidth data={["мягкая", "твердая"]} />
-        <SegmentedControl color="blue" fullWidth data={["А4", "А5", "А6"]} />
+        <SegmentedControl
+          color="blue"
+          fullWidth
+          data={coverType.map((type) => coverTypes[type])}
+        />
+        <SegmentedControl
+          color="blue"
+          fullWidth
+          data={coverFormat.map((format) => format)}
+        />
         <Text size="md" mt="xs" fw={700}>
           от {price} {roubleSign}
         </Text>

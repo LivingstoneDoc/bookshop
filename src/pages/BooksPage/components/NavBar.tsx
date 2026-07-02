@@ -1,7 +1,7 @@
 import { Button, Group } from "@mantine/core";
 import { useState } from "react";
 
-const sortingList = [
+const categoriesList = [
   { id: "1", label: "Все", value: "all" },
   { id: "2", label: "Саморазвитие", value: "self-development" },
   { id: "3", label: "Детектив", value: "detective" },
@@ -17,14 +17,14 @@ export const NavBar = () => {
   };
   return (
     <Group justify="flex-start" align="center" gap="xs">
-      {sortingList.map((item, i) => (
+      {categoriesList.map((category, i) => (
         <Button
-          key={item.id}
+          key={category.id}
           onClick={() => handleCategoryClick(i)}
           color="blue"
           variant={isActive === i ? "filled" : "subtle"}
         >
-          {item.label}
+          {category.label}
         </Button>
       ))}
     </Group>

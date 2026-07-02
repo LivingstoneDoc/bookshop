@@ -7,7 +7,7 @@ import {
   TextInput,
 } from "@mantine/core";
 import { MagnifyingGlassIcon, ShoppingCartIcon } from "@phosphor-icons/react";
-import { roubleSign } from "../constants";
+import { roubleSign } from "../constants/config";
 
 export const Header = () => {
   const searchIcon = <MagnifyingGlassIcon size={20} />;

@@ -7,32 +7,26 @@ import {
   Text,
 } from "@mantine/core";
 import { PlusIcon } from "@phosphor-icons/react";
-import { roubleSign } from "../../../constants";
-
-interface BookCardProps {
-  title: string;
-  author: string;
-  imgUrl: string;
-  coverType: number[];
-  coverFormat: string[];
-  price: number;
-}
+import { roubleSign } from "../../../constants/config";
+import type { Book } from "../../../types/book";
 
 export const BookCard = ({
+  id,
   title,
   author,
-  imgUrl,
-  coverType,
-  coverFormat,
+  bookCover,
+  coverTypesIndex,
+  bookFormats,
+  category,
   price,
-}: BookCardProps) => {
+}: Book) => {
   const coverTypes = ["мягкая", "твердая"];
   const addIcon = <PlusIcon size={20} />;
 
   return (
     <Card shadow="sm" padding="lg" withBorder h="100%">
       <Card.Section>
-        <Image src={imgUrl} height={220} fit="contain" p="md" alt={title} />
+        <Image src={bookCover} height={220} fit="contain" p="md" alt={title} />
       </Card.Section>
 
       <Text fw={500} mt="xs" lineClamp={2}>
@@ -46,12 +40,12 @@ export const BookCard = ({
         <SegmentedControl
           color="blue"
           fullWidth
-          data={coverType.map((type) => coverTypes[type])}
+          data={coverTypesIndex.map((type) => coverTypes[type])}
         />
         <SegmentedControl
           color="blue"
           fullWidth
-          data={coverFormat.map((format) => format)}
+          data={bookFormats.map((format) => format)}
         />
         <Text size="md" mt="xs" fw={700}>
           от {price} {roubleSign}

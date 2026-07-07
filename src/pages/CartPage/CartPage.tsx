@@ -1,5 +1,5 @@
 import { Text } from "@mantine/core";
 
-export const CardPage = () => {
+export const CartPage = () => {
   return <Text>Корзина</Text>;
 };

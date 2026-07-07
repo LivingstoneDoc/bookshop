@@ -22,6 +22,7 @@ export const NavBar = () => {
           key={category.id}
           onClick={() => handleCategoryClick(i)}
           color="blue"
+          px="xs"
           variant={isActive === i ? "filled" : "subtle"}
         >
           {category.label}

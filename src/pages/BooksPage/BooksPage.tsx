@@ -30,8 +30,15 @@ export const BooksPage = () => {
     if (isLoading) {
       return <BooksSkeleton />;
     }
-    if (books) {
+    if (!books || books.length === 0) {
       return (
+        <Title order={3} mt="xl" c="gray" ta="left">
+          Книги не найдены
+        </Title>
+      );
+    }
+    return (
+      <>
         <SimpleGrid
           cols={{ base: 1, xs: 2, md: 3, lg: 4 }}
           spacing="md"
@@ -51,22 +58,20 @@ export const BooksPage = () => {
             />
           ))}
         </SimpleGrid>
-      );
-    }
+        <Pagination total={10} mt="xs" py="md" />
+      </>
+    );
   };
   return (
-    <main>
-      <Container size="lg" py="md">
-        <Group justify="space-between" align="flex-end" mt="md">
-          <NavBar />
-          <Sort />
-        </Group>
-        <Title order={1} mt="xl" c="blue" style={{ textAlign: "left" }}>
-          Все книги
-        </Title>
-        {renderContent()}
-        <Pagination total={10} mt="xs" py="md" />
-      </Container>
-    </main>
+    <Container size="lg">
+      <Group justify="space-between" align="flex-end" gap="xs">
+        <NavBar />
+        <Sort />
+      </Group>
+      <Title order={1} mt="xl" c="blue" style={{ textAlign: "left" }}>
+        Все книги
+      </Title>
+      {renderContent()}
+    </Container>
   );
 };

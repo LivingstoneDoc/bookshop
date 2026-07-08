@@ -50,7 +50,7 @@ export const BooksPage = () => {
     }
     if (!books || books.length === 0) {
       return (
-        <Title order={3} mt="xl" c="gray" ta="left">
+        <Title order={3} mt="xl" c="dimmed" ta="left">
           Книги не найдены
         </Title>
       );

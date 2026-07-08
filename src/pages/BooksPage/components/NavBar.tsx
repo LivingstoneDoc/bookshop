@@ -1,5 +1,9 @@
-import { Button, Group } from "@mantine/core";
-import { useState } from "react";
+import { Button, Flex } from "@mantine/core";
+
+interface NavBarProps {
+  activeId: number;
+  onChange: (id: number) => void;
+}
 
 const categoriesList = [
   { id: "1", label: "Все", value: "all" },
@@ -10,24 +14,27 @@ const categoriesList = [
   { id: "6", label: "IT", value: "it" },
 ];
 
-export const NavBar = () => {
-  const [isActive, setIsActive] = useState(0);
-  const handleCategoryClick = (index: number) => {
-    setIsActive(index);
-  };
+export const NavBar = ({ activeId, onChange }: NavBarProps) => {
   return (
-    <Group justify="flex-start" align="center" gap="xs">
+    <Flex
+      direction={{ base: "column", sm: "row" }}
+      justify="flex-start"
+      align={{ base: "stretch", sm: "center" }}
+      gap="md"
+      w="100%"
+    >
       {categoriesList.map((category, i) => (
         <Button
           key={category.id}
-          onClick={() => handleCategoryClick(i)}
+          onClick={() => onChange(i)}
           color="blue"
           px="xs"
-          variant={isActive === i ? "filled" : "subtle"}
+          variant={activeId === i ? "filled" : "subtle"}
+          w={{ base: "100%", sm: "auto" }}
         >
           {category.label}
         </Button>
       ))}
-    </Group>
+    </Flex>
   );
 };

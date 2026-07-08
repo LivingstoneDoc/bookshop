@@ -6,7 +6,7 @@ import { AppShell } from "@mantine/core";
 export const RootLayout = () => {
   return (
     <AppShell
-      header={{ height: 60 }}
+      header={{ height: { base: 120, sm: 60 } }}
       footer={{ height: 60, offset: false }}
       padding="md"
     >

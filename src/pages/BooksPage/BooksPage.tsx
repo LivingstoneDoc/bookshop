@@ -1,4 +1,14 @@
-import { Container, Group, Pagination, SimpleGrid, Title } from "@mantine/core";
+import {
+  Box,
+  Burger,
+  Container,
+  Drawer,
+  Group,
+  Pagination,
+  SimpleGrid,
+  Stack,
+  Title,
+} from "@mantine/core";
 import { NavBar } from "./components/NavBar";
 import { Sort } from "./components/Sort";
 import { BookCard } from "./components/BookCard";
@@ -6,10 +16,13 @@ import { useEffect, useState } from "react";
 import type { Book } from "../../types/book";
 import { API_ENDPOINTS } from "../../constants/endpoints";
 import { BooksSkeleton } from "./components/BooksSkeleton";
+import { useDisclosure } from "@mantine/hooks";
 
 export const BooksPage = () => {
   const [books, setBooks] = useState<Book[] | null>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [opened, { open, close }] = useDisclosure(false);
+  const [activeCategory, setActiveCategory] = useState(0);
   useEffect(() => {
     if (!books) return;
     const fetchBooks = async () => {
@@ -25,6 +38,11 @@ export const BooksPage = () => {
     };
     fetchBooks();
   }, []);
+
+  const handleMobileCategoryChange = (id: number) => {
+    setActiveCategory(id);
+    close();
+  };
 
   const renderContent = () => {
     if (isLoading) {
@@ -63,15 +81,36 @@ export const BooksPage = () => {
     );
   };
   return (
-    <Container size="lg">
-      <Group justify="space-between" align="flex-end" gap="xs">
-        <NavBar />
-        <Sort />
-      </Group>
-      <Title order={1} mt="xl" c="blue" style={{ textAlign: "left" }}>
-        Все книги
-      </Title>
-      {renderContent()}
-    </Container>
+    <>
+      <Drawer
+        opened={opened}
+        onClose={close}
+        title="Категории книг"
+        padding="md"
+        size="sm"
+        hiddenFrom="sm"
+      >
+        <Stack justify="flex-start" align="flex-start" gap="xs">
+          <NavBar
+            activeId={activeCategory}
+            onChange={handleMobileCategoryChange}
+          />
+        </Stack>
+      </Drawer>
+      <Container size="lg">
+        <Group justify="space-between" align="flex-end">
+          <Burger onClick={open} hiddenFrom="sm" />
+
+          <Box visibleFrom="sm">
+            <NavBar activeId={activeCategory} onChange={setActiveCategory} />
+          </Box>
+          <Sort />
+        </Group>
+        <Title order={1} mt="xl" c="blue" style={{ textAlign: "left" }}>
+          Все книги
+        </Title>
+        {renderContent()}
+      </Container>
+    </>
   );
 };

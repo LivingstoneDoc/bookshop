@@ -1,3 +1,5 @@
+import type { CategoryId } from "./categories";
+
 export interface Book {
   id: string;
   title: string;
@@ -5,6 +7,6 @@ export interface Book {
   bookCover: string;
   coverTypesIndex: number[];
   bookFormats: string[];
-  category: number;
+  category: CategoryId;
   price: number;
 }

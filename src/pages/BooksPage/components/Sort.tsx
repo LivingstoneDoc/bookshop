@@ -1,13 +1,20 @@
 import { NativeSelect } from "@mantine/core";
+import { sortingList } from "../../../constants/config";
+import type { SortValue } from "../../../types/sort";
 
-const sortingList = [
-  { value: "popular", label: "Популярности" },
-  { value: "price_desc", label: "Наибольшей цене" },
-  { value: "price_asc", label: "Наименьшей цене" },
-  { value: "title_asc", label: "Алфавиту А-Я" },
-  { value: "title_desc", label: "Алфавиту Я-А" },
-];
+interface SortProps {
+  activeSort: SortValue;
+  onChangeSort: (value: SortValue) => void;
+}
 
-export const Sort = () => {
-  return <NativeSelect label="Сортировка по:" c="blue" data={sortingList} />;
+export const Sort = ({ activeSort, onChangeSort }: SortProps) => {
+  return (
+    <NativeSelect
+      value={activeSort}
+      onChange={(e) => onChangeSort(e.currentTarget.value as SortValue)}
+      label="Сортировка по:"
+      c="blue"
+      data={sortingList}
+    />
+  );
 };

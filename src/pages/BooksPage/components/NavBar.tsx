@@ -1,20 +1,13 @@
 import { Button, Flex } from "@mantine/core";
+import { categoriesList } from "../../../constants/config";
+import type { CategoryValue } from "../../../types/categories";
 
 interface NavBarProps {
-  activeId: number;
-  onChange: (id: number) => void;
+  activeCategory: CategoryValue;
+  onChange: (value: CategoryValue) => void;
 }
 
-const categoriesList = [
-  { id: "1", label: "Все", value: "all" },
-  { id: "2", label: "Саморазвитие", value: "self-development" },
-  { id: "3", label: "Детектив", value: "detective" },
-  { id: "4", label: "Русская Проза", value: "russian-prose" },
-  { id: "5", label: "Зарубежная Проза", value: "foreign-prose" },
-  { id: "6", label: "IT", value: "it" },
-];
-
-export const NavBar = ({ activeId, onChange }: NavBarProps) => {
+export const NavBar = ({ activeCategory, onChange }: NavBarProps) => {
   return (
     <Flex
       direction={{ base: "column", sm: "row" }}
@@ -23,13 +16,13 @@ export const NavBar = ({ activeId, onChange }: NavBarProps) => {
       gap="md"
       w="100%"
     >
-      {categoriesList.map((category, i) => (
+      {categoriesList.map((category) => (
         <Button
-          key={category.id}
-          onClick={() => onChange(i)}
+          key={category.value}
+          onClick={() => onChange(category.value)}
           color="blue"
           px="xs"
-          variant={activeId === i ? "filled" : "subtle"}
+          variant={activeCategory === category.value ? "filled" : "subtle"}
           w={{ base: "100%", sm: "auto" }}
         >
           {category.label}

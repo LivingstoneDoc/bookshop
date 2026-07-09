@@ -17,19 +17,43 @@ import type { Book } from "../../types/book";
 import { API_ENDPOINTS } from "../../constants/endpoints";
 import { BooksSkeleton } from "./components/BooksSkeleton";
 import { useDisclosure } from "@mantine/hooks";
+import { defaultCategory, defaultSortingItem } from "../../constants/config";
+import type { CategoryValue } from "../../types/categories";
+import type { SortValue } from "../../types/sort";
 
 export const BooksPage = () => {
   const [books, setBooks] = useState<Book[] | null>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [opened, { open, close }] = useDisclosure(false);
-  const [activeCategory, setActiveCategory] = useState(0);
+  const [activeCategoryValue, setActiveCategoryValue] =
+    useState<CategoryValue>(defaultCategory);
+  const [activeSortValue, setActiveSortValue] =
+    useState<SortValue>(defaultSortingItem);
   useEffect(() => {
-    if (!books) return;
     const fetchBooks = async () => {
       try {
-        const response = await fetch(API_ENDPOINTS.BOOKS.GET_ALL);
+        const url = new URL(API_ENDPOINTS.BOOKS.GET_ALL);
+
+        if (activeCategoryValue !== null) {
+          url.searchParams.append("category", String(activeCategoryValue));
+        }
+
+        if (activeSortValue.includes("_")) {
+          const [sortBy, order] = activeSortValue.split("_");
+          url.searchParams.append("sortBy", sortBy);
+          url.searchParams.append("order", order);
+        } else {
+          url.searchParams.append("sortBy", activeSortValue);
+          url.searchParams.append("order", "desc");
+        }
+
+        const response = await fetch(url.toString());
         const data = await response.json();
-        setBooks(data);
+        if (Array.isArray(data)) {
+          setBooks(data);
+        } else {
+          setBooks([]);
+        }
       } catch (error) {
         console.error("Error fetching books:", error);
       } finally {
@@ -37,10 +61,10 @@ export const BooksPage = () => {
       }
     };
     fetchBooks();
-  }, []);
+  }, [activeCategoryValue, activeSortValue]);
 
-  const handleMobileCategoryChange = (id: number) => {
-    setActiveCategory(id);
+  const handleMobileCategoryChange = (value: CategoryValue) => {
+    setActiveCategoryValue(value);
     close();
   };
 
@@ -92,7 +116,7 @@ export const BooksPage = () => {
       >
         <Stack justify="flex-start" align="flex-start" gap="xs">
           <NavBar
-            activeId={activeCategory}
+            activeCategory={activeCategoryValue}
             onChange={handleMobileCategoryChange}
           />
         </Stack>
@@ -102,9 +126,15 @@ export const BooksPage = () => {
           <Burger onClick={open} hiddenFrom="sm" />
 
           <Box visibleFrom="sm">
-            <NavBar activeId={activeCategory} onChange={setActiveCategory} />
+            <NavBar
+              activeCategory={activeCategoryValue}
+              onChange={setActiveCategoryValue}
+            />
           </Box>
-          <Sort />
+          <Sort
+            activeSort={activeSortValue}
+            onChangeSort={setActiveSortValue}
+          />
         </Group>
         <Title order={1} mt="xl" c="blue" style={{ textAlign: "left" }}>
           Все книги

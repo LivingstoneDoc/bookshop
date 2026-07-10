@@ -1,4 +1,4 @@
-import { Alert, Box, Container, Group, Text } from "@mantine/core";
+import { Alert, Box, Group, Text } from "@mantine/core";
 import { WarningIcon } from "@phosphor-icons/react";
 
 interface ErrorAlertProps {

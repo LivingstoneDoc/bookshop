@@ -56,7 +56,6 @@ export const BooksPage = () => {
 
       const response = await fetch(url.toString());
       const data = await response.json();
-      console.log("data", data);
       if (Array.isArray(data)) {
         setBooks(data);
       } else {

@@ -1,6 +1,7 @@
 import {
   Box,
   Burger,
+  Button,
   Container,
   Drawer,
   Group,
@@ -20,46 +21,55 @@ import { useDisclosure } from "@mantine/hooks";
 import { defaultCategory, defaultSortingItem } from "../../constants/config";
 import type { CategoryValue } from "../../types/categories";
 import type { SortValue } from "../../types/sort";
+import { ErrorAlert } from "../../components/ErrorAlert";
+import { ERROR_MESSAGES } from "../../constants/messages";
+import { ArrowClockwiseIcon } from "@phosphor-icons/react";
 
 export const BooksPage = () => {
   const [books, setBooks] = useState<Book[] | null>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [opened, { open, close }] = useDisclosure(false);
   const [activeCategoryValue, setActiveCategoryValue] =
     useState<CategoryValue>(defaultCategory);
   const [activeSortValue, setActiveSortValue] =
     useState<SortValue>(defaultSortingItem);
-  useEffect(() => {
-    const fetchBooks = async () => {
-      try {
-        const url = new URL(API_ENDPOINTS.BOOKS.GET_ALL);
+  const refreshIcon = <ArrowClockwiseIcon size={16} />;
+  const fetchBooks = async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const url = new URL(API_ENDPOINTS.BOOKS.GET_ALL);
 
-        if (activeCategoryValue !== null) {
-          url.searchParams.append("category", String(activeCategoryValue));
-        }
-
-        if (activeSortValue.includes("_")) {
-          const [sortBy, order] = activeSortValue.split("_");
-          url.searchParams.append("sortBy", sortBy);
-          url.searchParams.append("order", order);
-        } else {
-          url.searchParams.append("sortBy", activeSortValue);
-          url.searchParams.append("order", "desc");
-        }
-
-        const response = await fetch(url.toString());
-        const data = await response.json();
-        if (Array.isArray(data)) {
-          setBooks(data);
-        } else {
-          setBooks([]);
-        }
-      } catch (error) {
-        console.error("Error fetching books:", error);
-      } finally {
-        setIsLoading(false);
+      if (activeCategoryValue !== null) {
+        url.searchParams.append("category", String(activeCategoryValue));
       }
-    };
+
+      if (activeSortValue.includes("_")) {
+        const [sortBy, order] = activeSortValue.split("_");
+        url.searchParams.append("sortBy", sortBy);
+        url.searchParams.append("order", order);
+      } else {
+        url.searchParams.append("sortBy", activeSortValue);
+        url.searchParams.append("order", "desc");
+      }
+
+      const response = await fetch(url.toString());
+      const data = await response.json();
+      console.log("data", data);
+      if (Array.isArray(data)) {
+        setBooks(data);
+      } else {
+        setBooks([]);
+      }
+    } catch (error) {
+      console.error("Error fetching books:", error);
+      setError(ERROR_MESSAGES.FETCH_BOOKS_FAILED);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  useEffect(() => {
     fetchBooks();
   }, [activeCategoryValue, activeSortValue]);
 
@@ -69,6 +79,21 @@ export const BooksPage = () => {
   };
 
   const renderContent = () => {
+    if (error) {
+      return (
+        <ErrorAlert title={ERROR_MESSAGES.COMMON} message={error}>
+          <Button
+            variant="outline"
+            color="red"
+            leftSection={refreshIcon}
+            w={{ base: "100%", sm: "auto" }}
+            onClick={fetchBooks}
+          >
+            Повторить попытку
+          </Button>
+        </ErrorAlert>
+      );
+    }
     if (isLoading) {
       return <BooksSkeleton />;
     }

@@ -32,3 +32,9 @@ export const sortingList: SortOption[] = [
 ];
 
 export const defaultSortingItem = sortingList[0].value;
+
+export const PAGINATION = {
+  DEFAULT_PAGE: 1,
+  ITEMS_PER_PAGE: 8,
+  TOTAL_ITEMS: 10,
+};

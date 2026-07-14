@@ -17,13 +17,18 @@ import { useEffect, useState } from "react";
 import type { Book } from "../../types/book";
 import { API_ENDPOINTS } from "../../constants/endpoints";
 import { BooksSkeleton } from "./components/BooksSkeleton";
-import { useDisclosure } from "@mantine/hooks";
-import { defaultCategory, defaultSortingItem } from "../../constants/config";
+import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
+import {
+  defaultCategory,
+  defaultSortingItem,
+  PAGINATION,
+} from "../../constants/config";
 import type { CategoryValue } from "../../types/categories";
 import type { SortValue } from "../../types/sort";
 import { ErrorAlert } from "../../components/ErrorAlert";
 import { ERROR_MESSAGES } from "../../constants/messages";
 import { ArrowClockwiseIcon } from "@phosphor-icons/react";
+import { useSearch } from "../../Context/searchContext";
 
 export const BooksPage = () => {
   const [books, setBooks] = useState<Book[] | null>([]);
@@ -34,10 +39,15 @@ export const BooksPage = () => {
     useState<CategoryValue>(defaultCategory);
   const [activeSortValue, setActiveSortValue] =
     useState<SortValue>(defaultSortingItem);
+  const { searchValue } = useSearch();
+  const [debouncedSearch] = useDebouncedValue(searchValue, 400);
+  const [currentPage, setCurrentPage] = useState(PAGINATION.DEFAULT_PAGE);
+  const [totalPages, setTotalPages] = useState(PAGINATION.DEFAULT_PAGE);
   const refreshIcon = <ArrowClockwiseIcon size={16} />;
   const fetchBooks = async () => {
     setIsLoading(true);
     setError(null);
+    const normalizedInputSearch = debouncedSearch.trim();
     try {
       const url = new URL(API_ENDPOINTS.BOOKS.GET_ALL);
 
@@ -54,10 +64,27 @@ export const BooksPage = () => {
         url.searchParams.append("order", "desc");
       }
 
+      if (normalizedInputSearch !== "") {
+        url.searchParams.append("search", normalizedInputSearch);
+      }
+
+      url.searchParams.append("page", String(currentPage));
+      url.searchParams.append("limit", String(PAGINATION.ITEMS_PER_PAGE));
+
       const response = await fetch(url.toString());
+      if (!response.ok) {
+        setBooks([]);
+        setTotalPages(0);
+        return;
+      }
       const data = await response.json();
+
       if (Array.isArray(data)) {
         setBooks(data);
+        const calculatedTotalPages = Math.ceil(
+          PAGINATION.TOTAL_ITEMS / PAGINATION.ITEMS_PER_PAGE,
+        );
+        setTotalPages(calculatedTotalPages);
       } else {
         setBooks([]);
       }
@@ -69,8 +96,12 @@ export const BooksPage = () => {
     }
   };
   useEffect(() => {
+    setCurrentPage(PAGINATION.DEFAULT_PAGE);
+  }, [activeCategoryValue, activeSortValue, debouncedSearch]);
+
+  useEffect(() => {
     fetchBooks();
-  }, [activeCategoryValue, activeSortValue]);
+  }, [activeCategoryValue, activeSortValue, debouncedSearch, currentPage]);
 
   const handleMobileCategoryChange = (value: CategoryValue) => {
     setActiveCategoryValue(value);
@@ -124,7 +155,13 @@ export const BooksPage = () => {
             />
           ))}
         </SimpleGrid>
-        <Pagination total={10} mt="xs" py="md" />
+        <Pagination
+          value={currentPage}
+          onChange={setCurrentPage}
+          total={totalPages}
+          mt="xs"
+          py="md"
+        />
       </>
     );
   };

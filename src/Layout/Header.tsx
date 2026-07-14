@@ -1,13 +1,13 @@
-import { Button, Group, Stack, Text, TextInput } from "@mantine/core";
-import { MagnifyingGlassIcon, ShoppingCartIcon } from "@phosphor-icons/react";
+import { Button, Group, Stack, Text } from "@mantine/core";
+import { ShoppingCartIcon } from "@phosphor-icons/react";
 import { roubleSign } from "../constants/config";
 import { Link, useNavigate } from "react-router";
 import { useMediaQuery } from "@mantine/hooks";
+import { SearchInput } from "./components/SearchInput";
 
 export const Header = () => {
   const navigate = useNavigate();
   const isMobile = useMediaQuery("(max-width: 768px)");
-  const searchIcon = <MagnifyingGlassIcon size={20} />;
   const cartIcon = <ShoppingCartIcon size={20} />;
   if (isMobile) {
     return (
@@ -38,12 +38,7 @@ export const Header = () => {
             </Group>
           </Button>
         </Group>
-        <TextInput
-          label=""
-          placeholder="Поиск книги..."
-          w="100%"
-          leftSection={searchIcon}
-        />
+        <SearchInput />
       </Stack>
     );
   }
@@ -54,12 +49,7 @@ export const Header = () => {
           BookShop
         </Text>
       </Link>
-      <TextInput
-        label=""
-        placeholder="Поиск книги..."
-        w={300}
-        leftSection={searchIcon}
-      />
+      <SearchInput />
       <Button onClick={() => navigate("/cart")}>
         <Group>
           <Group gap="xs">

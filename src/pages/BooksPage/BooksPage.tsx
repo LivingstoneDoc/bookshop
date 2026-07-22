@@ -81,7 +81,6 @@ export const BooksPage = () => {
       }
       const allItems = await fullResponse.json();
       const totalCount = Array.isArray(allItems) ? allItems.length : 0;
-      console.log("totalCount", totalCount);
       const calculatedTotalPages = Math.ceil(
         totalCount / PAGINATION.ITEMS_PER_PAGE,
       );

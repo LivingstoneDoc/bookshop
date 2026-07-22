@@ -3,10 +3,10 @@ import { sortingList } from "../../../constants/config";
 import type { SortValue } from "../../../types/sort";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "../../../redux/store";
-import { changeSortingValue } from "../../../redux/slices/filterSlice";
+import { changeSortingValue } from "../../../redux/slices/booksParamsSlice";
 
 export const Sort = () => {
-  const activeSort = useSelector((state: RootState) => state.filter.sortValue);
+  const activeSort = useSelector((state: RootState) => state.params.sortValue);
   const dispatch = useDispatch();
   return (
     <NativeSelect

@@ -23,8 +23,12 @@ import { ErrorAlert } from "../../components/ErrorAlert";
 import { ERROR_MESSAGES } from "../../constants/messages";
 import { ArrowClockwiseIcon } from "@phosphor-icons/react";
 import { useSearch } from "../../Context/searchContext";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "../../redux/store";
+import {
+  changeCurrentPage,
+  changeTotalPages,
+} from "../../redux/slices/booksParamsSlice";
 
 export const BooksPage = () => {
   const [books, setBooks] = useState<Book[] | null>([]);
@@ -33,13 +37,16 @@ export const BooksPage = () => {
   const [opened, { open, close }] = useDisclosure(false);
   const { searchValue } = useSearch();
   const [debouncedSearch] = useDebouncedValue(searchValue, 400);
-  const [currentPage, setCurrentPage] = useState(PAGINATION.DEFAULT_PAGE);
-  const [totalPages, setTotalPages] = useState(PAGINATION.DEFAULT_PAGE);
+  const currentPage = useSelector(
+    (state: RootState) => state.params.currentPage,
+  );
+  const totalPages = useSelector((state: RootState) => state.params.totalPages);
+  const dispatch = useDispatch();
   const activeCategoryValue = useSelector(
-    (state: RootState) => state.filter.category,
+    (state: RootState) => state.params.category,
   );
   const activeSortValue = useSelector(
-    (state: RootState) => state.filter.sortValue,
+    (state: RootState) => state.params.sortValue,
   );
   const refreshIcon = <ArrowClockwiseIcon size={16} />;
   const fetchBooks = async () => {
@@ -66,26 +73,41 @@ export const BooksPage = () => {
         url.searchParams.append("search", normalizedInputSearch);
       }
 
-      url.searchParams.append("page", String(currentPage));
-      url.searchParams.append("limit", String(PAGINATION.ITEMS_PER_PAGE));
+      const fullResponse = await fetch(url.toString());
+      if (!fullResponse.ok) {
+        setBooks([]);
+        dispatch(changeTotalPages(0));
+        return;
+      }
+      const allItems = await fullResponse.json();
+      const totalCount = Array.isArray(allItems) ? allItems.length : 0;
+      console.log("totalCount", totalCount);
+      const calculatedTotalPages = Math.ceil(
+        totalCount / PAGINATION.ITEMS_PER_PAGE,
+      );
+      dispatch(changeTotalPages(calculatedTotalPages));
 
-      const response = await fetch(url.toString());
+      if (totalCount === 0) {
+        setBooks([]);
+        return;
+      }
+
+      const paginatedUrl = new URL(url.toString());
+      paginatedUrl.searchParams.append("page", String(currentPage));
+      paginatedUrl.searchParams.append(
+        "limit",
+        String(PAGINATION.ITEMS_PER_PAGE),
+      );
+
+      const response = await fetch(paginatedUrl.toString());
       if (!response.ok) {
         setBooks([]);
-        setTotalPages(0);
+        dispatch(changeTotalPages(0));
         return;
       }
       const data = await response.json();
 
-      if (Array.isArray(data)) {
-        setBooks(data);
-        const calculatedTotalPages = Math.ceil(
-          PAGINATION.TOTAL_ITEMS / PAGINATION.ITEMS_PER_PAGE,
-        );
-        setTotalPages(calculatedTotalPages);
-      } else {
-        setBooks([]);
-      }
+      setBooks(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error("Error fetching books:", error);
       setError(ERROR_MESSAGES.FETCH_BOOKS_FAILED);
@@ -94,12 +116,16 @@ export const BooksPage = () => {
     }
   };
   useEffect(() => {
-    setCurrentPage(PAGINATION.DEFAULT_PAGE);
+    dispatch(changeCurrentPage(PAGINATION.DEFAULT_PAGE));
   }, [activeCategoryValue, activeSortValue, debouncedSearch]);
 
   useEffect(() => {
     fetchBooks();
   }, [activeCategoryValue, activeSortValue, debouncedSearch, currentPage]);
+
+  const handlePageChange = (newPage: number) => {
+    dispatch(changeCurrentPage(newPage));
+  };
 
   const renderContent = () => {
     if (error) {
@@ -150,8 +176,8 @@ export const BooksPage = () => {
         </SimpleGrid>
         <Pagination
           value={currentPage}
-          onChange={setCurrentPage}
-          total={totalPages}
+          onChange={handlePageChange}
+          total={totalPages > 0 ? totalPages : PAGINATION.DEFAULT_PAGE}
           mt="xs"
           py="md"
         />

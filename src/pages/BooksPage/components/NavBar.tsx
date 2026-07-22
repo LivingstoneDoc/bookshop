@@ -3,7 +3,7 @@ import { categoriesList } from "../../../constants/config";
 import type { CategoryValue } from "../../../types/categories";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "../../../redux/store";
-import { changeCategory } from "../../../redux/slices/filterSlice";
+import { changeCategory } from "../../../redux/slices/booksParamsSlice";
 
 interface NavBarProps {
   onCloseDrawer?: () => void;
@@ -11,7 +11,7 @@ interface NavBarProps {
 
 export const NavBar = ({ onCloseDrawer }: NavBarProps) => {
   const activeCategory = useSelector(
-    (state: RootState) => state.filter.category,
+    (state: RootState) => state.params.category,
   );
   const dispatch = useDispatch();
 

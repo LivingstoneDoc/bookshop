@@ -18,31 +18,29 @@ import type { Book } from "../../types/book";
 import { API_ENDPOINTS } from "../../constants/endpoints";
 import { BooksSkeleton } from "./components/BooksSkeleton";
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
-import {
-  defaultCategory,
-  defaultSortingItem,
-  PAGINATION,
-} from "../../constants/config";
-import type { CategoryValue } from "../../types/categories";
-import type { SortValue } from "../../types/sort";
+import { PAGINATION } from "../../constants/config";
 import { ErrorAlert } from "../../components/ErrorAlert";
 import { ERROR_MESSAGES } from "../../constants/messages";
 import { ArrowClockwiseIcon } from "@phosphor-icons/react";
 import { useSearch } from "../../Context/searchContext";
+import { useSelector } from "react-redux";
+import type { RootState } from "../../redux/store";
 
 export const BooksPage = () => {
   const [books, setBooks] = useState<Book[] | null>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [opened, { open, close }] = useDisclosure(false);
-  const [activeCategoryValue, setActiveCategoryValue] =
-    useState<CategoryValue>(defaultCategory);
-  const [activeSortValue, setActiveSortValue] =
-    useState<SortValue>(defaultSortingItem);
   const { searchValue } = useSearch();
   const [debouncedSearch] = useDebouncedValue(searchValue, 400);
   const [currentPage, setCurrentPage] = useState(PAGINATION.DEFAULT_PAGE);
   const [totalPages, setTotalPages] = useState(PAGINATION.DEFAULT_PAGE);
+  const activeCategoryValue = useSelector(
+    (state: RootState) => state.filter.category,
+  );
+  const activeSortValue = useSelector(
+    (state: RootState) => state.filter.sortValue,
+  );
   const refreshIcon = <ArrowClockwiseIcon size={16} />;
   const fetchBooks = async () => {
     setIsLoading(true);
@@ -102,11 +100,6 @@ export const BooksPage = () => {
   useEffect(() => {
     fetchBooks();
   }, [activeCategoryValue, activeSortValue, debouncedSearch, currentPage]);
-
-  const handleMobileCategoryChange = (value: CategoryValue) => {
-    setActiveCategoryValue(value);
-    close();
-  };
 
   const renderContent = () => {
     if (error) {
@@ -176,10 +169,7 @@ export const BooksPage = () => {
         hiddenFrom="sm"
       >
         <Stack justify="flex-start" align="flex-start" gap="xs">
-          <NavBar
-            activeCategory={activeCategoryValue}
-            onChange={handleMobileCategoryChange}
-          />
+          <NavBar onCloseDrawer={close} />
         </Stack>
       </Drawer>
       <Container size="lg">
@@ -187,15 +177,9 @@ export const BooksPage = () => {
           <Burger onClick={open} hiddenFrom="sm" />
 
           <Box visibleFrom="sm">
-            <NavBar
-              activeCategory={activeCategoryValue}
-              onChange={setActiveCategoryValue}
-            />
+            <NavBar />
           </Box>
-          <Sort
-            activeSort={activeSortValue}
-            onChangeSort={setActiveSortValue}
-          />
+          <Sort />
         </Group>
         <Title order={1} mt="xl" c="blue" style={{ textAlign: "left" }}>
           Все книги

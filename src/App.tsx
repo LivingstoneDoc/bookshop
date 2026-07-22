@@ -6,6 +6,8 @@ import { createTheme } from "@mantine/core";
 import { MantineProvider } from "@mantine/core";
 import { RouterProvider } from "react-router";
 import { router } from "./Router/router";
+import { Provider } from "react-redux";
+import { store } from "./redux/store";
 
 const myTheme = createTheme({
   fontFamily: "Montserrat, sans-serif",
@@ -16,9 +18,11 @@ const myTheme = createTheme({
 
 function App() {
   return (
-    <MantineProvider theme={myTheme}>
-      <RouterProvider router={router} />
-    </MantineProvider>
+    <Provider store={store}>
+      <MantineProvider theme={myTheme}>
+        <RouterProvider router={router} />
+      </MantineProvider>
+    </Provider>
   );
 }
 

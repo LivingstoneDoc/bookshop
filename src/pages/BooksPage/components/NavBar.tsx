@@ -1,22 +1,17 @@
 import { Button, Flex } from "@mantine/core";
 import { categoriesList } from "../../../constants/config";
 import type { CategoryValue } from "../../../types/categories";
-import { useDispatch, useSelector } from "react-redux";
-import type { RootState } from "../../../redux/store";
-import { changeCategory } from "../../../redux/slices/booksParamsSlice";
+import { useQueryParams } from "../../../hooks/useQueryParams";
 
 interface NavBarProps {
   onCloseDrawer?: () => void;
 }
 
 export const NavBar = ({ onCloseDrawer }: NavBarProps) => {
-  const activeCategory = useSelector(
-    (state: RootState) => state.params.category,
-  );
-  const dispatch = useDispatch();
+  const { activeCategoryValue, setActiveCategoryValue } = useQueryParams();
 
   const handleMobileCategoryChange = (value: CategoryValue) => {
-    dispatch(changeCategory(value));
+    setActiveCategoryValue(value);
     onCloseDrawer?.();
   };
 
@@ -34,7 +29,7 @@ export const NavBar = ({ onCloseDrawer }: NavBarProps) => {
           onClick={() => handleMobileCategoryChange(category.value)}
           color="blue"
           px="xs"
-          variant={activeCategory === category.value ? "filled" : "subtle"}
+          variant={activeCategoryValue === category.value ? "filled" : "subtle"}
           w={{ base: "100%", sm: "auto" }}
         >
           {category.label}

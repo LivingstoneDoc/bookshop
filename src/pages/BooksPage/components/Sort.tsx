@@ -1,19 +1,13 @@
 import { NativeSelect } from "@mantine/core";
 import { sortingList } from "../../../constants/config";
-import type { SortValue } from "../../../types/sort";
-import { useDispatch, useSelector } from "react-redux";
-import type { RootState } from "../../../redux/store";
-import { changeSortingValue } from "../../../redux/slices/booksParamsSlice";
+import { useQueryParams } from "../../../hooks/useQueryParams";
 
 export const Sort = () => {
-  const activeSort = useSelector((state: RootState) => state.params.sortValue);
-  const dispatch = useDispatch();
+  const { activeSortValue, setActiveSortValue } = useQueryParams();
   return (
     <NativeSelect
-      value={activeSort}
-      onChange={(e) =>
-        dispatch(changeSortingValue(e.currentTarget.value as SortValue))
-      }
+      value={activeSortValue}
+      onChange={(e) => setActiveSortValue(e.currentTarget.value)}
       label="Сортировка по:"
       c="blue"
       data={sortingList}

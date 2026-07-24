@@ -22,33 +22,34 @@ import { PAGINATION } from "../../constants/config";
 import { ErrorAlert } from "../../components/ErrorAlert";
 import { ERROR_MESSAGES } from "../../constants/messages";
 import { ArrowClockwiseIcon } from "@phosphor-icons/react";
-import { useSearch } from "../../Context/searchContext";
 import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "../../redux/store";
-import {
-  changeCurrentPage,
-  changeTotalPages,
-} from "../../redux/slices/booksParamsSlice";
+import { changeTotalPages } from "../../redux/slices/booksParamsSlice";
+import { useQueryParams } from "../../hooks/useQueryParams";
+import { checkBooksSearch } from "../../utils/bookUtils";
 
 export const BooksPage = () => {
   const [books, setBooks] = useState<Book[] | null>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [opened, { open, close }] = useDisclosure(false);
-  const { searchValue } = useSearch();
-  const [debouncedSearch] = useDebouncedValue(searchValue, 400);
-  const currentPage = useSelector(
-    (state: RootState) => state.params.currentPage,
-  );
   const totalPages = useSelector((state: RootState) => state.params.totalPages);
   const dispatch = useDispatch();
-  const activeCategoryValue = useSelector(
-    (state: RootState) => state.params.category,
-  );
-  const activeSortValue = useSelector(
-    (state: RootState) => state.params.sortValue,
-  );
+  const {
+    activeCategoryValue,
+    activeSortValue,
+    currentPage,
+    searchValue,
+    setCurrentPage,
+  } = useQueryParams();
+  const [debouncedSearch] = useDebouncedValue(searchValue, 400);
   const refreshIcon = <ArrowClockwiseIcon size={16} />;
+
+  const resetBooksState = () => {
+    setBooks([]);
+    dispatch(changeTotalPages(0));
+  };
+
   const fetchBooks = async () => {
     setIsLoading(true);
     setError(null);
@@ -75,11 +76,11 @@ export const BooksPage = () => {
 
       const fullResponse = await fetch(url.toString());
       if (!fullResponse.ok) {
-        setBooks([]);
-        dispatch(changeTotalPages(0));
+        resetBooksState();
         return;
       }
-      const allItems = await fullResponse.json();
+      let allItems = await fullResponse.json();
+      allItems = checkBooksSearch(allItems, normalizedInputSearch);
       const totalCount = Array.isArray(allItems) ? allItems.length : 0;
       const calculatedTotalPages = Math.ceil(
         totalCount / PAGINATION.ITEMS_PER_PAGE,
@@ -87,7 +88,7 @@ export const BooksPage = () => {
       dispatch(changeTotalPages(calculatedTotalPages));
 
       if (totalCount === 0) {
-        setBooks([]);
+        resetBooksState();
         return;
       }
 
@@ -100,31 +101,24 @@ export const BooksPage = () => {
 
       const response = await fetch(paginatedUrl.toString());
       if (!response.ok) {
-        setBooks([]);
-        dispatch(changeTotalPages(0));
+        resetBooksState();
         return;
       }
-      const data = await response.json();
-
+      let data = await response.json();
+      data = checkBooksSearch(data, normalizedInputSearch);
       setBooks(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error("Error fetching books:", error);
       setError(ERROR_MESSAGES.FETCH_BOOKS_FAILED);
+      resetBooksState();
     } finally {
       setIsLoading(false);
     }
   };
-  useEffect(() => {
-    dispatch(changeCurrentPage(PAGINATION.DEFAULT_PAGE));
-  }, [activeCategoryValue, activeSortValue, debouncedSearch]);
 
   useEffect(() => {
     fetchBooks();
-  }, [activeCategoryValue, activeSortValue, debouncedSearch, currentPage]);
-
-  const handlePageChange = (newPage: number) => {
-    dispatch(changeCurrentPage(newPage));
-  };
+  }, [activeCategoryValue, activeSortValue, currentPage, debouncedSearch]);
 
   const renderContent = () => {
     if (error) {
@@ -175,7 +169,7 @@ export const BooksPage = () => {
         </SimpleGrid>
         <Pagination
           value={currentPage}
-          onChange={handlePageChange}
+          onChange={setCurrentPage}
           total={totalPages > 0 ? totalPages : PAGINATION.DEFAULT_PAGE}
           mt="xs"
           py="md"

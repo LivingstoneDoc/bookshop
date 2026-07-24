@@ -1,10 +1,10 @@
 import { ActionIcon, TextInput } from "@mantine/core";
 import { MagnifyingGlassIcon, XIcon } from "@phosphor-icons/react";
-import { useSearch } from "../../Context/searchContext";
 import { useRef } from "react";
+import { useQueryParams } from "../../hooks/useQueryParams";
 
 export const SearchInput = () => {
-  const { searchValue, setSearchValue } = useSearch();
+  const { searchValue, setSearchValue } = useQueryParams();
   const inputRef = useRef<HTMLInputElement | null>(null);
   const searchIcon = <MagnifyingGlassIcon size={20} />;
 

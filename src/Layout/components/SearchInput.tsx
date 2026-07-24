@@ -1,14 +1,28 @@
 import { ActionIcon, TextInput } from "@mantine/core";
 import { MagnifyingGlassIcon, XIcon } from "@phosphor-icons/react";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useQueryParams } from "../../hooks/useQueryParams";
+import { useDebouncedValue } from "@mantine/hooks";
 
 export const SearchInput = () => {
   const { searchValue, setSearchValue } = useQueryParams();
   const inputRef = useRef<HTMLInputElement | null>(null);
+  const [inputValue, setInputValue] = useState(searchValue || "");
+  const [debouncedInputValue] = useDebouncedValue(inputValue, 400);
   const searchIcon = <MagnifyingGlassIcon size={20} />;
 
+  useEffect(() => {
+    setInputValue(searchValue || "");
+  }, [searchValue]);
+
+  useEffect(() => {
+    if (debouncedInputValue !== (searchValue || "")) {
+      setSearchValue(debouncedInputValue);
+    }
+  }, [debouncedInputValue]);
+
   const handleClearInput = () => {
+    setInputValue("");
     setSearchValue("");
     inputRef.current?.focus();
   };
@@ -26,13 +40,13 @@ export const SearchInput = () => {
   return (
     <TextInput
       ref={inputRef}
-      value={searchValue}
-      onChange={(e) => setSearchValue(e.currentTarget.value)}
+      value={inputValue}
+      onChange={(e) => setInputValue(e.currentTarget.value)}
       label=""
       placeholder="Поиск книги..."
       w={300}
       leftSection={searchIcon}
-      rightSection={searchValue && clearIcon}
+      rightSection={inputValue && clearIcon}
     />
   );
 };

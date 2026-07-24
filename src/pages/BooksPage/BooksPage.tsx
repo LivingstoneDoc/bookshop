@@ -42,7 +42,6 @@ export const BooksPage = () => {
     searchValue,
     setCurrentPage,
   } = useQueryParams();
-  const [debouncedSearch] = useDebouncedValue(searchValue, 400);
   const refreshIcon = <ArrowClockwiseIcon size={16} />;
 
   const resetBooksState = () => {
@@ -53,7 +52,7 @@ export const BooksPage = () => {
   const fetchBooks = async () => {
     setIsLoading(true);
     setError(null);
-    const normalizedInputSearch = debouncedSearch.trim();
+    const normalizedInputSearch = (searchValue || "").trim();
     try {
       const url = new URL(API_ENDPOINTS.BOOKS.GET_ALL);
 
@@ -118,7 +117,7 @@ export const BooksPage = () => {
 
   useEffect(() => {
     fetchBooks();
-  }, [activeCategoryValue, activeSortValue, currentPage, debouncedSearch]);
+  }, [activeCategoryValue, activeSortValue, currentPage, searchValue]);
 
   const renderContent = () => {
     if (error) {

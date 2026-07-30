@@ -1,5 +1,10 @@
 import { useSearchParams } from "react-router";
-import { defaultSortingItem, PAGINATION } from "../constants/config";
+import {
+  categoriesList,
+  defaultSortingItem,
+  PAGINATION,
+} from "../constants/config";
+import type { CategoryValue } from "../types/categories";
 
 const QUERY_KEYS = {
   CATEGORY: "category",
@@ -11,9 +16,23 @@ const QUERY_KEYS = {
 type QueryValuesType = (typeof QUERY_KEYS)[keyof typeof QUERY_KEYS];
 type UrlParamsType = Partial<Record<QueryValuesType, string | number | null>>;
 
+const getCategoryLabel = (value: CategoryValue) => {
+  const selectedCategory = categoriesList.find(
+    (category) => category.value === value,
+  );
+  const defaulCategory = categoriesList.find(
+    (category) => category.value === null,
+  );
+  return selectedCategory?.label || defaulCategory?.label || "";
+};
+
 export const useQueryParams = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const activeCategoryValue = searchParams.get(QUERY_KEYS.CATEGORY);
+  const categoryParam = searchParams.get(QUERY_KEYS.CATEGORY);
+  const activeCategoryValue = categoryParam
+    ? (Number(categoryParam) as CategoryValue)
+    : null;
+  const activeCategoryLabel = getCategoryLabel(activeCategoryValue);
   const activeSortValue =
     searchParams.get(QUERY_KEYS.SORT) || defaultSortingItem;
   const currentPage =
@@ -59,6 +78,7 @@ export const useQueryParams = () => {
 
   return {
     activeCategoryValue,
+    activeCategoryLabel,
     activeSortValue,
     currentPage,
     searchValue,

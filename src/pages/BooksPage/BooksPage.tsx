@@ -17,7 +17,7 @@ import { useEffect, useState } from "react";
 import type { Book } from "../../types/book";
 import { API_ENDPOINTS } from "../../constants/endpoints";
 import { BooksSkeleton } from "./components/BooksSkeleton";
-import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
+import { useDisclosure } from "@mantine/hooks";
 import { PAGINATION } from "../../constants/config";
 import { ErrorAlert } from "../../components/ErrorAlert";
 import { ERROR_MESSAGES } from "../../constants/messages";
@@ -37,6 +37,7 @@ export const BooksPage = () => {
   const dispatch = useDispatch();
   const {
     activeCategoryValue,
+    activeCategoryLabel,
     activeSortValue,
     currentPage,
     searchValue,
@@ -200,7 +201,7 @@ export const BooksPage = () => {
           <Sort />
         </Group>
         <Title order={1} mt="xl" c="blue" style={{ textAlign: "left" }}>
-          Все книги
+          {activeCategoryLabel}
         </Title>
         {renderContent()}
       </Container>

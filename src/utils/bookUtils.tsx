@@ -6,7 +6,9 @@ export const checkBooksSearch = (books: Book[], searchStr: string): Book[] => {
 
   return books.filter((book) => {
     const titleParam = book.title?.toLowerCase().includes(lowCaseSearchString);
-    const authorParam = book.title?.toLowerCase().includes(lowCaseSearchString);
+    const authorParam = book.author
+      ?.toLowerCase()
+      .includes(lowCaseSearchString);
     return titleParam || authorParam;
   });
 };

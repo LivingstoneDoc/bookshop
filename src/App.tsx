@@ -4,6 +4,7 @@ import "@fontsource/montserrat/500.css";
 import "@fontsource/montserrat/700.css";
 import { createTheme } from "@mantine/core";
 import { MantineProvider } from "@mantine/core";
+import { ModalsProvider } from "@mantine/modals";
 import { RouterProvider } from "react-router";
 import { router } from "./Router/router";
 import { Provider } from "react-redux";
@@ -20,7 +21,9 @@ function App() {
   return (
     <Provider store={store}>
       <MantineProvider theme={myTheme}>
-        <RouterProvider router={router} />
+        <ModalsProvider>
+          <RouterProvider router={router} />
+        </ModalsProvider>
       </MantineProvider>
     </Provider>
   );

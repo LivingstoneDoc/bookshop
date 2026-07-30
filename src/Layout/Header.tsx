@@ -4,8 +4,14 @@ import { roubleSign } from "../constants/config";
 import { Link, useNavigate } from "react-router";
 import { useMediaQuery } from "@mantine/hooks";
 import { SearchInput } from "./components/SearchInput";
+import { useSelector } from "react-redux";
+import type { RootState } from "../redux/store";
 
 export const Header = () => {
+  const { cartItems, totalPrice } = useSelector(
+    (state: RootState) => state.cart,
+  );
+  const totalBooksAmount = cartItems.reduce((sum, item) => item.count + sum, 0);
   const navigate = useNavigate();
   const isMobile = useMediaQuery("(max-width: 768px)");
   const cartIcon = <ShoppingCartIcon size={20} />;
@@ -21,7 +27,7 @@ export const Header = () => {
           <Button px="xs" onClick={() => navigate("/cart")}>
             <Group>
               <Group gap="xs">
-                <Text>{0}</Text>
+                <Text>{totalPrice}</Text>
                 <Text>{roubleSign}</Text>
               </Group>{" "}
               <Text
@@ -33,7 +39,7 @@ export const Header = () => {
               ></Text>
               <Group gap="xs">
                 {cartIcon}
-                <Text>{0}</Text>
+                <Text>{totalBooksAmount}</Text>
               </Group>
             </Group>
           </Button>
@@ -50,10 +56,15 @@ export const Header = () => {
         </Text>
       </Link>
       <SearchInput />
-      <Button onClick={() => navigate("/cart")}>
+      <Button onClick={() => navigate("/cart")} px="xs">
         <Group>
-          <Group gap="xs">
-            <Text>{0}</Text>
+          <Group gap={1}>
+            <Text
+              w={totalPrice === 0 ? 30 : 60}
+              style={{ fontVariantNumeric: "tabular-nums" }}
+            >
+              {totalPrice}
+            </Text>
             <Text>{roubleSign}</Text>
           </Group>{" "}
           <Text
@@ -65,7 +76,9 @@ export const Header = () => {
           ></Text>
           <Group gap="xs">
             {cartIcon}
-            <Text>{0}</Text>
+            <Text w={25} style={{ fontVariantNumeric: "tabular-nums" }}>
+              {totalBooksAmount}
+            </Text>
           </Group>
         </Group>
       </Button>

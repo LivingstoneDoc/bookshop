@@ -38,3 +38,9 @@ export const PAGINATION = {
   ITEMS_PER_PAGE: 8,
   TOTAL_ITEMS: 10,
 };
+
+export const CART = {
+  ITEMS: [],
+  TOTAL_PRICE: 0,
+  DEFAULT_AMOUNT: 1,
+};

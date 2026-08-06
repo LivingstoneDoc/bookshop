@@ -13,28 +13,22 @@ import {
 import { NavBar } from "./components/NavBar";
 import { Sort } from "./components/Sort";
 import { BookCard } from "./components/BookCard";
-import { useEffect, useState } from "react";
-import type { Book } from "../../types/book";
-import { API_ENDPOINTS } from "../../constants/endpoints";
+import { useCallback, useEffect } from "react";
 import { BooksSkeleton } from "./components/BooksSkeleton";
 import { useDisclosure } from "@mantine/hooks";
 import { PAGINATION } from "../../constants/config";
 import { ErrorAlert } from "../../components/ErrorAlert";
 import { ERROR_MESSAGES } from "../../constants/messages";
 import { ArrowClockwiseIcon } from "@phosphor-icons/react";
-import { useDispatch, useSelector } from "react-redux";
-import type { RootState } from "../../redux/store";
-import { changeTotalPages } from "../../redux/slices/booksParamsSlice";
+import { fetchBooks } from "../../redux/slices/bookSlice";
 import { useQueryParams } from "../../hooks/useQueryParams";
-import { checkBooksSearch } from "../../utils/bookUtils";
+import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 
 export const BooksPage = () => {
-  const [books, setBooks] = useState<Book[] | null>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [opened, { open, close }] = useDisclosure(false);
-  const totalPages = useSelector((state: RootState) => state.params.totalPages);
-  const dispatch = useDispatch();
+  const books = useAppSelector((state) => state.book.items);
+  const { totalPages, status, error } = useAppSelector((state) => state.book);
+  const dispatch = useAppDispatch();
   const {
     activeCategoryValue,
     activeCategoryLabel,
@@ -45,83 +39,29 @@ export const BooksPage = () => {
   } = useQueryParams();
   const refreshIcon = <ArrowClockwiseIcon size={16} />;
 
-  const resetBooksState = () => {
-    setBooks([]);
-    dispatch(changeTotalPages(0));
-  };
-
-  const fetchBooks = async () => {
-    setIsLoading(true);
-    setError(null);
-    const normalizedInputSearch = (searchValue || "").trim();
-    try {
-      const url = new URL(API_ENDPOINTS.BOOKS.GET_ALL);
-
-      if (activeCategoryValue !== null) {
-        url.searchParams.append("category", String(activeCategoryValue));
-      }
-
-      if (activeSortValue.includes("_")) {
-        const [sortBy, order] = activeSortValue.split("_");
-        url.searchParams.append("sortBy", sortBy);
-        url.searchParams.append("order", order);
-      } else {
-        url.searchParams.append("sortBy", activeSortValue);
-        url.searchParams.append("order", "desc");
-      }
-
-      if (normalizedInputSearch !== "") {
-        url.searchParams.append("search", normalizedInputSearch);
-      }
-
-      const fullResponse = await fetch(url.toString());
-      if (!fullResponse.ok) {
-        resetBooksState();
-        return;
-      }
-      let allItems = await fullResponse.json();
-      allItems = checkBooksSearch(allItems, normalizedInputSearch);
-      const totalCount = Array.isArray(allItems) ? allItems.length : 0;
-      const calculatedTotalPages = Math.ceil(
-        totalCount / PAGINATION.ITEMS_PER_PAGE,
-      );
-      dispatch(changeTotalPages(calculatedTotalPages));
-
-      if (totalCount === 0) {
-        resetBooksState();
-        return;
-      }
-
-      const paginatedUrl = new URL(url.toString());
-      paginatedUrl.searchParams.append("page", String(currentPage));
-      paginatedUrl.searchParams.append(
-        "limit",
-        String(PAGINATION.ITEMS_PER_PAGE),
-      );
-
-      const response = await fetch(paginatedUrl.toString());
-      if (!response.ok) {
-        resetBooksState();
-        return;
-      }
-      let data = await response.json();
-      data = checkBooksSearch(data, normalizedInputSearch);
-      setBooks(Array.isArray(data) ? data : []);
-    } catch (error) {
-      console.error("Error fetching books:", error);
-      setError(ERROR_MESSAGES.FETCH_BOOKS_FAILED);
-      resetBooksState();
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const handleFetchBooks = useCallback(() => {
+    dispatch(
+      fetchBooks({
+        activeCategoryValue,
+        activeSortValue,
+        currentPage,
+        searchValue,
+      }),
+    );
+  }, [
+    dispatch,
+    activeCategoryValue,
+    activeSortValue,
+    currentPage,
+    searchValue,
+  ]);
 
   useEffect(() => {
-    fetchBooks();
+    handleFetchBooks();
   }, [activeCategoryValue, activeSortValue, currentPage, searchValue]);
 
   const renderContent = () => {
-    if (error) {
+    if (status === "error") {
       return (
         <ErrorAlert title={ERROR_MESSAGES.COMMON} message={error}>
           <Button
@@ -129,14 +69,14 @@ export const BooksPage = () => {
             color="red"
             leftSection={refreshIcon}
             w={{ base: "100%", sm: "auto" }}
-            onClick={fetchBooks}
+            onClick={handleFetchBooks}
           >
             Повторить попытку
           </Button>
         </ErrorAlert>
       );
     }
-    if (isLoading) {
+    if (status === "loading") {
       return <BooksSkeleton />;
     }
     if (!books || books.length === 0) {

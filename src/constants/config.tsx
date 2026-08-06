@@ -44,3 +44,7 @@ export const CART = {
   TOTAL_PRICE: 0,
   DEFAULT_AMOUNT: 1,
 };
+
+export const BOOKS = {
+  DEFAULT_ITEMS: [],
+};

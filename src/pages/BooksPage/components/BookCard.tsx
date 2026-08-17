@@ -10,8 +10,7 @@ import { PlusIcon } from "@phosphor-icons/react";
 import { CART, roubleSign } from "../../../constants/config";
 import type { Book } from "../../../types/book";
 import { useDispatch, useSelector } from "react-redux";
-import { addBook } from "../../../redux/slices/cartSlice";
-import type { RootState } from "../../../redux/store";
+import { addBook, cartSelector } from "../../../redux/slices/cartSlice";
 import { useState } from "react";
 import type { CartItemProps } from "../../../types/cart";
 
@@ -25,7 +24,7 @@ export const BookCard = ({
   category,
   price,
 }: Book) => {
-  const { cartItems } = useSelector((state: RootState) => state.cart);
+  const { cartItems } = useSelector(cartSelector);
   const dispatch = useDispatch();
   const coverTypes = ["мягкая", "твердая"];
   const [activeBookCoverType, setActiveBookCoverType] = useState(

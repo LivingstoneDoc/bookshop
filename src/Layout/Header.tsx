@@ -5,12 +5,10 @@ import { Link, useNavigate } from "react-router";
 import { useMediaQuery } from "@mantine/hooks";
 import { SearchInput } from "./components/SearchInput";
 import { useSelector } from "react-redux";
-import type { RootState } from "../redux/store";
+import { cartSelector } from "../redux/slices/cartSlice";
 
 export const Header = () => {
-  const { cartItems, totalPrice } = useSelector(
-    (state: RootState) => state.cart,
-  );
+  const { cartItems, totalPrice } = useSelector(cartSelector);
   const totalBooksAmount = cartItems.reduce((sum, item) => item.count + sum, 0);
   const navigate = useNavigate();
   const isMobile = useMediaQuery("(max-width: 768px)");

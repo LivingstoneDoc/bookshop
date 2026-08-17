@@ -2,6 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 import { CART } from "../../constants/config";
 import type { CartItemProps } from "../../types/cart";
+import type { RootState } from "../store";
 
 export interface cartState {
   cartItems: CartItemProps[];
@@ -65,6 +66,8 @@ export const cartSlice = createSlice({
     },
   },
 });
+
+export const cartSelector = (state: RootState) => state.cart;
 
 export const {
   addBook,

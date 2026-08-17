@@ -2,15 +2,12 @@ import { Button, Container, Group, Stack, Text, Title } from "@mantine/core";
 import { TrashIcon } from "@phosphor-icons/react";
 import { CartItem } from "./components/CartItem";
 import { useDispatch, useSelector } from "react-redux";
-import type { RootState } from "../../redux/store";
-import { clearCart } from "../../redux/slices/cartSlice";
+import { cartSelector, clearCart } from "../../redux/slices/cartSlice";
 import { EmptyCart } from "./components/EmptyCart";
 import { modals } from "@mantine/modals";
 
 export const CartPage = () => {
-  const { cartItems, totalPrice } = useSelector(
-    (state: RootState) => state.cart,
-  );
+  const { cartItems, totalPrice } = useSelector(cartSelector);
   const dispatch = useDispatch();
   const trashIcon = <TrashIcon size={16} />;
 

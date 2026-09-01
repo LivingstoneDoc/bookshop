@@ -4,6 +4,7 @@ import { RootLayout } from "../Layout/RootLayout";
 import { BooksPage } from "../pages/BooksPage/BooksPage";
 import { CartPage } from "../pages/CartPage/CartPage";
 import { NotFoundPage } from "../pages/NotFoundPage/NotFoundPage";
+import { BookDetailsPage } from "../pages/BookDetailsPage/BookDetailsPage";
 
 export const router = createBrowserRouter([
   {
@@ -11,6 +12,7 @@ export const router = createBrowserRouter([
     element: <RootLayout />,
     children: [
       { index: true, element: <BooksPage /> },
+      { path: APP_ROUTES.BOOK, element: <BookDetailsPage /> },
       { path: APP_ROUTES.CART, element: <CartPage /> },
       { path: APP_ROUTES.NOT_FOUND, element: <NotFoundPage /> },
     ],

@@ -16,10 +16,9 @@ import { BookCard } from "./components/BookCard";
 import { useCallback, useEffect } from "react";
 import { BooksSkeleton } from "./components/BooksSkeleton";
 import { useDisclosure } from "@mantine/hooks";
-import { PAGINATION } from "../../constants/config";
+import { PAGINATION, refreshIcon } from "../../constants/config";
 import { ErrorAlert } from "../../components/ErrorAlert";
 import { ERROR_MESSAGES } from "../../constants/messages";
-import { ArrowClockwiseIcon } from "@phosphor-icons/react";
 import { fetchBooks } from "../../redux/slices/bookSlice";
 import { useQueryParams } from "../../hooks/useQueryParams";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
@@ -27,7 +26,9 @@ import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 export const BooksPage = () => {
   const [opened, { open, close }] = useDisclosure(false);
   const books = useAppSelector((state) => state.book.items);
-  const { totalPages, status, error } = useAppSelector((state) => state.book);
+  const { totalPages, listStatus, listError } = useAppSelector(
+    (state) => state.book,
+  );
   const dispatch = useAppDispatch();
   const {
     activeCategoryValue,
@@ -37,7 +38,6 @@ export const BooksPage = () => {
     searchValue,
     setCurrentPage,
   } = useQueryParams();
-  const refreshIcon = <ArrowClockwiseIcon size={16} />;
 
   const handleFetchBooks = useCallback(() => {
     dispatch(
@@ -58,12 +58,12 @@ export const BooksPage = () => {
 
   useEffect(() => {
     handleFetchBooks();
-  }, [activeCategoryValue, activeSortValue, currentPage, searchValue]);
+  }, [handleFetchBooks]);
 
   const renderContent = () => {
-    if (status === "error") {
+    if (listStatus === "error") {
       return (
-        <ErrorAlert title={ERROR_MESSAGES.COMMON} message={error}>
+        <ErrorAlert title={ERROR_MESSAGES.COMMON} message={listError}>
           <Button
             variant="outline"
             color="red"
@@ -76,7 +76,7 @@ export const BooksPage = () => {
         </ErrorAlert>
       );
     }
-    if (status === "loading") {
+    if (listStatus === "loading") {
       return <BooksSkeleton />;
     }
     if (!books || books.length === 0) {
@@ -104,6 +104,7 @@ export const BooksPage = () => {
               bookFormats={book.bookFormats}
               price={book.price}
               category={book.category}
+              description={book.description}
             />
           ))}
         </SimpleGrid>

@@ -24,8 +24,11 @@ type Status = "loading" | "success" | "error";
 interface BookState {
   items: Book[];
   totalPages: number;
-  status: Status;
-  error: string | null;
+  listStatus: Status;
+  listError: string | null;
+  itemDetails: Book | null;
+  detailsStatus: Status;
+  detailsError: string | null;
 }
 
 export const fetchBooks = createAsyncThunk<
@@ -102,38 +105,82 @@ export const fetchBooks = createAsyncThunk<
   }
 });
 
+export const fetchBookById = createAsyncThunk<
+  Book,
+  string,
+  { rejectValue: string }
+>("book/fetchBookById", async (id, ThunkAPI) => {
+  try {
+    const response = await fetch(`${API_ENDPOINTS.BOOKS.GET_ALL}/${id}`);
+    if (!response.ok) {
+      return;
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error fetching book", error);
+    if (error instanceof Error) {
+      return ThunkAPI.rejectWithValue(error.message);
+    }
+    return ThunkAPI.rejectWithValue(ERROR_MESSAGES.COMMON);
+  }
+});
+
 const initialState: BookState = {
   items: BOOKS.DEFAULT_ITEMS,
   totalPages: PAGINATION.DEFAULT_PAGE,
-  status: "loading",
-  error: null,
+  listStatus: "loading",
+  listError: null,
+  itemDetails: null,
+  detailsStatus: "loading",
+  detailsError: null,
 };
 
 export const bookSlice = createSlice({
   name: "book",
   initialState,
-  reducers: {},
+  reducers: {
+    clearItemDetails: (state) => {
+      state.itemDetails = null;
+      state.detailsStatus = "loading";
+      state.detailsError = null;
+    },
+  },
   extraReducers: (builder) => {
     builder.addCase(fetchBooks.pending, (state) => {
-      state.status = "loading";
+      state.listStatus = "loading";
       state.totalPages = 0;
-      state.error = null;
+      state.listError = null;
     });
     builder.addCase(fetchBooks.fulfilled, (state, action) => {
-      state.status = "success";
+      state.listStatus = "success";
       state.items = action.payload.items;
       state.totalPages = action.payload.totalPages;
-      state.error = null;
+      state.listError = null;
     });
     builder.addCase(fetchBooks.rejected, (state, action) => {
       state.items = BOOKS.DEFAULT_ITEMS;
       state.totalPages = 0;
-      state.status = "error";
-      state.error = action.payload as string;
+      state.listStatus = "error";
+      state.listError = action.payload as string;
+    });
+    builder.addCase(fetchBookById.pending, (state) => {
+      state.detailsStatus = "loading";
+      state.detailsError = null;
+    });
+    builder.addCase(fetchBookById.fulfilled, (state, action) => {
+      state.detailsStatus = "success";
+      state.itemDetails = action.payload;
+      state.detailsError = null;
+    });
+    builder.addCase(fetchBookById.rejected, (state, action) => {
+      state.detailsStatus = "error";
+      state.itemDetails = null;
+      state.detailsError = action.payload as string;
     });
   },
 });
 
-export const {} = bookSlice.actions;
+export const { clearItemDetails } = bookSlice.actions;
 
 export default bookSlice.reducer;

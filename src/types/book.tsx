@@ -9,4 +9,6 @@ export interface Book {
   bookFormats: string[];
   category: CategoryId;
   price: number;
+  rating?: number;
+  description: string;
 }

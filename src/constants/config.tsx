@@ -1,3 +1,4 @@
+import { ArrowClockwiseIcon } from "@phosphor-icons/react";
 import { CATEGORIES, type CategoryOption } from "../types/categories";
 import { SORT_VALUES, type SortOption } from "../types/sort";
 
@@ -48,3 +49,5 @@ export const CART = {
 export const BOOKS = {
   DEFAULT_ITEMS: [],
 };
+
+export const refreshIcon = <ArrowClockwiseIcon size={16} />;

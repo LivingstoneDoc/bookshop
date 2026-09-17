@@ -3,19 +3,21 @@ import type { PayloadAction } from "@reduxjs/toolkit";
 import { CART } from "../../constants/config";
 import type { CartItemProps } from "../../types/cart";
 import type { RootState } from "../store";
+import {
+  calcTotalPrice,
+  getCartDataFromLocalStorage,
+} from "../../utils/cartUtils";
 
 export interface cartState {
   cartItems: CartItemProps[];
   totalPrice: number;
 }
 
-const initialState: cartState = {
-  cartItems: CART.ITEMS,
-  totalPrice: CART.TOTAL_PRICE,
-};
+const { cartItems, totalPrice } = getCartDataFromLocalStorage();
 
-const calcTotalPrice = (items: CartItemProps[]) => {
-  return items.reduce((sum, item) => item.price * item.count + sum, 0);
+const initialState: cartState = {
+  cartItems,
+  totalPrice,
 };
 
 export const cartSlice = createSlice({

@@ -1,4 +1,4 @@
-import { Card, Image, Stack, Text } from "@mantine/core";
+import { Card, Image, Text } from "@mantine/core";
 import type { Book } from "../../../types/book";
 import { generatePath, Link } from "react-router";
 import { APP_ROUTES } from "../../../constants/routes";

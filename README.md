@@ -1,73 +1,67 @@
-# React + TypeScript + Vite
+# Bookshop - React E-Commerce Application
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Современное веб-приложение книжного интернет-магазина (Single Page Application), разработанное с использованием актуального стека технологий.
 
-Currently, two official plugins are available:
+## Особенности проекта (Features)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+**Каталог книг:** Главная страница с отображением списка товаров.
+**Фильтрация и поиск:**
 
-## React Compiler
+- Поиск книг по названию и автору.
+- Фильтрация по категориям.
+- Сортировка (по популярности, алфавиту, цене).
+  **Синхронизация состояния с URL (Query Parameters):** все фильтры, поиск и текущая страница пагинации сохраняются в адресной строке. Это позволяет легко делиться ссылками на конкретные результаты поиска.
+  **Пагинация:** Удобное разделение списка товаров на страницы.
+  **Детальная страница товара:** Отдельная страница с описанием выбранной книги.
+  **Корзина и вариации товаров (Redux Toolkit):**
+- Возможность выбора формата книги (например, А4, А5) и типа обложки (твердая, мягкая) перед добавлением в корзину.
+- Глобальное управление состоянием корзины.
+  **UI/UX:**
+- Современный и адаптивный дизайн на базе компонентов **Mantine UI**.
+- Полноценная обработка ошибок.
+- Отображение уведомлений.
+- Кастомная страница `404 Not Found`.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Технологии (Tech Stack)
 
-## Expanding the ESLint configuration
+**Frontend Framework:** React 18
+**Language:** TypeScript
+**Build Tool:** Vite
+**State Management:** Redux Toolkit (RTK)
+**Routing:** React Router v6
+**UI Library:** Mantine UI
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Запуск проекта локально (Getting Started)
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+### Предварительные требования
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+Убедитесь, что у вас установлен [Node.js](https://nodejs.org/) (версии 18+).
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### Установка
+
+1. Склонируйте репозиторий:
+
+```bash
+  git clone https://github.com/LivingstoneDoc/bookshop
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+2. Перейдите в папку проекта:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+  cd bookshop
 ```
+
+3. Установите зависимости:
+
+```bash
+  npm install
+```
+
+4. Запустите сервер для разработки:
+
+```bash
+  npm run dev
+```
+
+5. Откройте приложение в браузере по адресу (обычно это):
+   `http://localhost:5173`

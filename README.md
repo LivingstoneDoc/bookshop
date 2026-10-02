@@ -1,6 +1,6 @@
 # Bookshop - React E-Commerce Application
 
-[![Vercel](https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://bookshop-omega-sand.vercel.app/)
+[![Vercel](https://img.shields.io/badge/Vercel-Live_Demo-gray?style=for-the-badge&logo=vercel&labelColor=000000&logoColor=white)](https://bookshop-omega-sand.vercel.app/)
 
 Современное веб-приложение книжного интернет-магазина (Single Page Application), разработанное с использованием актуального стека технологий.
 
